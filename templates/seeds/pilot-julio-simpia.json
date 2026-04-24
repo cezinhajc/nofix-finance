@@ -1,0 +1,36 @@
+{
+  "entidades": [
+    {
+      "nome": "Julio",
+      "tipo": "Pessoa",
+      "status": "Ativa",
+      "moeda": "BRL",
+      "timezone": "America/Maceio"
+    },
+    {
+      "nome": "Simpia",
+      "tipo": "Empresa",
+      "status": "Ativa",
+      "moeda": "BRL",
+      "timezone": "America/Maceio"
+    }
+  ],
+  "categorias": [
+    {"nome": "Moradia", "entidade": "Julio", "tipo": "Despesa"},
+    {"nome": "Alimentação", "entidade": "Julio", "tipo": "Despesa"},
+    {"nome": "Transporte", "entidade": "Julio", "tipo": "Despesa"},
+    {"nome": "Saúde", "entidade": "Julio", "tipo": "Despesa"},
+    {"nome": "Lazer", "entidade": "Julio", "tipo": "Despesa"},
+    {"nome": "Receitas Pessoais", "entidade": "Julio", "tipo": "Receita"},
+    {"nome": "Receita de Projetos", "entidade": "Simpia", "tipo": "Receita"},
+    {"nome": "Ferramentas", "entidade": "Simpia", "tipo": "Despesa"},
+    {"nome": "Parceiros", "entidade": "Simpia", "tipo": "Despesa"},
+    {"nome": "Impostos", "entidade": "Simpia", "tipo": "Despesa"},
+    {"nome": "Administrativo", "entidade": "Simpia", "tipo": "Despesa"},
+    {"nome": "Marketing", "entidade": "Simpia", "tipo": "Despesa"}
+  ],
+  "clientes_projetos": [
+    {"nome": "Hospital Cirurgia", "entidade": "Simpia", "tipo": "Cliente", "status": "Ativo"},
+    {"nome": "Clínica Silhouette Estética Avançada", "entidade": "Simpia", "tipo": "Cliente", "status": "Ativo"}
+  ]
+}
