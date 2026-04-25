@@ -31,7 +31,7 @@ Cada cartão deve consolidar:
 - valor total da fatura pode ser informado manualmente
 - compras podem ser lançadas no Notion e consolidadas por operação interna
 
-## Campo novo
+## Campos novos
 
 ### Valor total da fatura
 Tipo sugerido:
@@ -41,9 +41,23 @@ Uso:
 - armazenar o valor consolidado da fatura atual do cartão
 - pode vir da API ou preenchimento manual
 
-## Evolução futura
+### Competência da fatura
+Tipo sugerido:
+- rich_text
 
-Também faz sentido incluir depois:
-- Competência da fatura
-- Valor a pagar
-- Fonte do cartão (API ou Manual)
+Uso:
+- indicar o mês/competência da fatura atual
+
+### Valor a pagar
+Tipo sugerido:
+- number
+
+Uso:
+- informar o valor efetivo esperado para pagamento
+
+### Origem do cartão
+Tipo sugerido:
+- select: API, Manual
+
+Uso:
+- distinguir cartões sincronizados de cartões cadastrados manualmente

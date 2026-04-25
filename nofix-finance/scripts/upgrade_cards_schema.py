@@ -40,11 +40,14 @@ def main():
     payload = {
         'properties': {
             'Valor total da fatura': {'number': {'format': 'real'}},
+            'Competência da fatura': {'rich_text': {}},
+            'Valor a pagar': {'number': {'format': 'real'}},
+            'Origem do cartão': {'select': {'options': [{'name': 'API'}, {'name': 'Manual'}]}},
         }
     }
     res = requests.patch(f'https://api.notion.com/v1/databases/{CARTOES_DB_ID}', headers=headers(token), json=payload, timeout=60)
     res.raise_for_status()
-    print(json.dumps({'status': 'ok', 'added_property': 'Valor total da fatura'}, ensure_ascii=False, indent=2))
+    print(json.dumps({'status': 'ok', 'added_properties': ['Valor total da fatura', 'Competência da fatura', 'Valor a pagar', 'Origem do cartão']}, ensure_ascii=False, indent=2))
 
 
 if __name__ == '__main__':
