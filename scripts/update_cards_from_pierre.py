@@ -108,6 +108,9 @@ def main():
     for account in data.get('data', {}).get('accounts', []):
         card_name = account.get('account_name') or 'Cartão sem nome'
         page = find_card_page(notion_token, card_name)
+        due_date = account.get('balance_due_date') or ''
+        competencia = due_date[:7] if due_date else ''
+        bill_amount = account.get('current_bill_amount') or 0
         props = {
             'Banco': rich_text_prop(card_name),
             'Limite total': number_prop(account.get('credit_limit') or 0),
@@ -115,8 +118,11 @@ def main():
             'Dia de fechamento': number_prop(account.get('closing_day') or 0),
             'Titular': rich_text_prop('Pierre/Open Finance'),
             'Ativo?': checkbox_prop(True),
-            'Valor total da fatura': number_prop(account.get('current_bill_amount') or 0),
-            'Observações': rich_text_prop(f"Fatura atual: {account.get('current_bill_amount') or 0} | Vencimento: {account.get('balance_due_date') or 'n/d'}"),
+            'Valor total da fatura': number_prop(bill_amount),
+            'Competência da fatura': rich_text_prop(competencia),
+            'Valor a pagar': number_prop(bill_amount),
+            'Origem do cartão': select_prop('API'),
+            'Observações': rich_text_prop(f"Fatura atual: {bill_amount} | Vencimento: {due_date or 'n/d'}"),
         }
         if page:
             notion_update_page(notion_token, page['id'], props)
