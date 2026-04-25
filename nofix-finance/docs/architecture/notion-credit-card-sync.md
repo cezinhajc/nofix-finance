@@ -24,3 +24,9 @@ A escrita completa e automática com relações poderá ser incrementada na sequ
 - atualizar limite do cartão
 - gerar contas a pagar vinculadas
 - impedir duplicidade de processamento
+
+## Regra de idempotência inicial
+
+Antes de criar parcelas, o worker deve verificar se já existem registros com o mesmo rótulo de parcela para a mesma compra processada.
+
+Se encontrar correspondência, deve interromper a criação e sinalizar que a compra já foi processada.

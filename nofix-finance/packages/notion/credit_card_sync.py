@@ -28,6 +28,7 @@ class CreditCardSyncService:
         new_limit = calculate_new_available_limit(card, purchase.total_amount)
 
         return {
+            'purchase_key': f"{purchase.description}|{purchase.purchase_date.isoformat()}|{purchase.total_amount}|{purchase.installments}|{card.name}",
             'card': asdict(card),
             'purchase': {
                 **purchase_data,
