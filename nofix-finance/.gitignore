@@ -9,3 +9,6 @@ coverage/
 client.config.json
 *.local
 .DS_Store
+__pycache__/
+*.pyc
+tmp_*.json
