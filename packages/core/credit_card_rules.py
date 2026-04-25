@@ -44,8 +44,10 @@ def safe_date(year: int, month: int, day: int) -> date:
     return date(year, month, min(day, last_day))
 
 
-def first_statement_offset(purchase_day: int, closing_day: int) -> int:
-    return 1 if purchase_day <= closing_day else 2
+def first_due_offset(purchase_day: int, closing_day: int, due_day: int) -> int:
+    if purchase_day <= closing_day:
+        return 0 if purchase_day < due_day else 1
+    return 1 if purchase_day < due_day else 2
 
 
 def generate_installments(card: CreditCard, purchase: CreditPurchase) -> list[Installment]:
@@ -56,11 +58,11 @@ def generate_installments(card: CreditCard, purchase: CreditPurchase) -> list[In
     diff = round(purchase.total_amount - sum(amounts), 2)
     amounts[-1] = round(amounts[-1] + diff, 2)
 
-    offset = first_statement_offset(purchase.purchase_date.day, card.closing_day)
+    offset = first_due_offset(purchase.purchase_date.day, card.closing_day, card.due_day)
     items: list[Installment] = []
 
     for idx in range(purchase.installments):
-        year, month = add_months(purchase.purchase_date.year, purchase.purchase_date.month, offset - 1 + idx)
+        year, month = add_months(purchase.purchase_date.year, purchase.purchase_date.month, offset + idx)
         due = safe_date(year, month, card.due_day)
         items.append(
             Installment(
