@@ -1,0 +1,32 @@
+# Bases adicionais, Contas a Pagar e Contas a Receber
+
+## Contas a Pagar
+- Título (title)
+- Tipo da conta (select: Fixa, Variável)
+- Status (select: Prevista, Paga, Vencida, Cancelada)
+- Fornecedor (rich_text)
+- Valor previsto (number)
+- Valor pago (number)
+- Competência (date)
+- Vencimento (date)
+- Data de pagamento (date)
+- Forma de pagamento (select: Pix, TED, Boleto, Cartão, Dinheiro, Outro)
+- Recorrente? (checkbox)
+- Periodicidade (select: Semanal, Quinzenal, Mensal, Anual, Avulsa)
+- Centro de custo (rich_text)
+- Observações (rich_text)
+
+## Contas a Receber
+- Título (title)
+- Tipo da conta (select: Fixa, Variável)
+- Status (select: Prevista, Recebida, Vencida, Cancelada)
+- Cliente (rich_text)
+- Valor previsto (number)
+- Valor recebido (number)
+- Competência (date)
+- Vencimento (date)
+- Data de recebimento (date)
+- Forma de recebimento (select: Pix, TED, Boleto, Cartão, Dinheiro, Outro)
+- Recorrente? (checkbox)
+- Periodicidade (select: Semanal, Quinzenal, Mensal, Anual, Avulsa)
+- Observações (rich_text)
