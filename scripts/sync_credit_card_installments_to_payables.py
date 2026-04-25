@@ -44,6 +44,12 @@ def create_page(token: str, database_id: str, properties: dict):
     return res.json()
 
 
+def update_page(token: str, page_id: str, properties: dict):
+    res = requests.patch(f'https://api.notion.com/v1/pages/{page_id}', headers=headers(token), json={'properties': properties}, timeout=60)
+    res.raise_for_status()
+    return res.json()
+
+
 def title_prop(text: str):
     return {'title': [{'type': 'text', 'text': {'content': text}}]}
 
@@ -66,6 +72,10 @@ def checkbox_prop(value: bool):
 
 def rich_text_prop(text: str):
     return {'rich_text': [{'type': 'text', 'text': {'content': text}}]}
+
+
+def relation_prop(page_ids: list[str]):
+    return {'relation': [{'id': page_id} for page_id in page_ids]}
 
 
 def extract_title(row: dict, prop: str):
@@ -117,6 +127,7 @@ def main():
 
         payable = create_page(token, PAGAR_DB_ID, {
             'Título': title_prop(label),
+            'Parcela Rel': relation_prop([row['id']]),
             'Tipo da conta': select_prop('Variável'),
             'Status': select_prop('Prevista'),
             'Fornecedor': rich_text_prop('Cartão de crédito'),
@@ -126,6 +137,9 @@ def main():
             'Recorrente?': checkbox_prop(False),
             'Periodicidade': select_prop('Avulsa'),
             'Observações': rich_text_prop(f'Gerado a partir de parcela de cartão | parcel_ref={label}'),
+        })
+        update_page(token, row['id'], {
+            'Conta a Pagar Rel': relation_prop([payable['id']])
         })
         created.append({'label': label, 'id': payable['id'], 'url': payable.get('url')})
 
