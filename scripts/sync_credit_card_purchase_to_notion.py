@@ -71,6 +71,24 @@ def rich_text_prop(text: str):
     return {'rich_text': [{'type': 'text', 'text': {'content': text}}]}
 
 
+def find_existing_installment(token: str, label: str):
+    query = requests.post(
+        f'https://api.notion.com/v1/databases/{PARCELAS_DB_ID}/query',
+        headers=headers(token),
+        json={
+            'filter': {
+                'property': 'Parcela',
+                'title': {'equals': label}
+            },
+            'page_size': 1,
+        },
+        timeout=60,
+    )
+    query.raise_for_status()
+    results = query.json().get('results', [])
+    return results[0] if results else None
+
+
 def main():
     env = load_env(ENV_FILE)
     token = env.get('NOTION_TOKEN')
@@ -94,6 +112,17 @@ def main():
         },
     )
 
+    first_label = result['installments'][0]['label']
+    existing = find_existing_installment(token, first_label)
+    if existing:
+        print(json.dumps({
+            'status': 'skipped',
+            'reason': 'purchase_already_processed',
+            'purchase_key': result['purchase_key'],
+            'existing_installment_id': existing['id'],
+        }, ensure_ascii=False, indent=2))
+        return
+
     created = []
     for item in result['installments']:
         page = create_page(token, PARCELAS_DB_ID, {
@@ -104,7 +133,7 @@ def main():
             'Vencimento': date_prop(item['due_date']),
             'Status': select_prop('Aberta'),
             'Lançamento gerado?': checkbox_prop(False),
-            'Observações': rich_text_prop('Gerado automaticamente pelo Nofix'),
+            'Observações': rich_text_prop(f"Gerado automaticamente pelo Nofix | purchase_key={result['purchase_key']}"),
         })
         created.append({'id': page['id'], 'url': page.get('url')})
 
