@@ -73,6 +73,10 @@ def pick_card(cards: list[dict], requested_name: str | None):
     return cards[0] if cards else None
 
 
+def relation_prop(page_ids: list[str]):
+    return {'relation': [{'id': page_id} for page_id in page_ids]}
+
+
 def main():
     env = load_env(ENV_FILE)
     token = env.get('NOTION_TOKEN')
@@ -129,6 +133,7 @@ def main():
         created = []
         for item in result['installments']:
             page = create_page(token, PARCELAS_DB_ID, {
+                'Compra Rel': relation_prop([row['id']]),
                 'Parcela': title_prop(item['label']),
                 'Número da parcela': number_prop(item['number']),
                 'Valor da parcela': number_prop(item['amount']),
@@ -144,6 +149,8 @@ def main():
         update_page(token, row['id'], {
             'Processada?': checkbox_prop(True),
             'Purchase Key': rich_text_prop(result['purchase_key']),
+            'Cartão Rel': relation_prop([card['page_id']]),
+            'Parcelas Rel': relation_prop(created),
         })
         processed.append({'id': row['id'], 'description': description, 'card': card['name'], 'created_installments': len(created)})
 
