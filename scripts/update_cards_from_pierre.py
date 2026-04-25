@@ -115,6 +115,7 @@ def main():
             'Dia de fechamento': number_prop(account.get('closing_day') or 0),
             'Titular': rich_text_prop('Pierre/Open Finance'),
             'Ativo?': checkbox_prop(True),
+            'Valor total da fatura': number_prop(account.get('current_bill_amount') or 0),
             'Observações': rich_text_prop(f"Fatura atual: {account.get('current_bill_amount') or 0} | Vencimento: {account.get('balance_due_date') or 'n/d'}"),
         }
         if page:
