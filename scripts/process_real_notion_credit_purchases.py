@@ -44,6 +44,11 @@ def extract_rich_text(row: dict, prop: str):
     return ''.join(part.get('plain_text', '') for part in parts)
 
 
+def extract_relation_first_id(row: dict, prop: str):
+    rel = row.get('properties', {}).get(prop, {}).get('relation', [])
+    return rel[0]['id'] if rel else None
+
+
 def get_cards(token: str):
     rows = query_database(token, CARTOES_DB_ID, {'page_size': 100}).get('results', [])
     cards = []
@@ -61,7 +66,11 @@ def get_cards(token: str):
     return cards
 
 
-def pick_card(cards: list[dict], requested_name: str | None):
+def pick_card(cards: list[dict], requested_name: str | None = None, requested_page_id: str | None = None):
+    if requested_page_id:
+        for card in cards:
+            if card['page_id'] == requested_page_id:
+                return card
     requested_name = (requested_name or '').strip()
     if requested_name:
         for card in cards:
@@ -102,7 +111,8 @@ def main():
         purchase_date = extract_date(row, 'Data da compra')
         installments = extract_number(row, 'Número de parcelas') or 1
         requested_card_name = extract_rich_text(row, 'Cartão')
-        card = pick_card(cards, requested_card_name)
+        requested_card_rel = extract_relation_first_id(row, 'Cartão Rel')
+        card = pick_card(cards, requested_card_name, requested_card_rel)
 
         if not description or total_amount is None or not purchase_date:
             skipped.append({'id': row['id'], 'reason': 'missing_data'})

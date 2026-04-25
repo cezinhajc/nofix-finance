@@ -48,6 +48,10 @@ def notion_create_page(token: str, properties: dict):
     return res.json()
 
 
+def relation_prop(page_ids: list[str]):
+    return {'relation': [{'id': page_id} for page_id in page_ids]}
+
+
 def title_prop(text: str):
     return {'title': [{'type': 'text', 'text': {'content': text[:2000]}}]}
 
@@ -84,6 +88,22 @@ def purchase_exists(token: str, purchase_key: str):
     return results[0] if results else None
 
 
+def find_card_page(token: str, card_name: str):
+    res = requests.post(
+        'https://api.notion.com/v1/databases/34d56dc3-d76c-8104-bde4-caa30af4a2f1/query',
+        headers=notion_headers(token),
+        json={'page_size': 100},
+        timeout=60,
+    )
+    res.raise_for_status()
+    for row in res.json().get('results', []):
+        title = row.get('properties', {}).get('Nome do cartão', {}).get('title', [])
+        name = ''.join(part.get('plain_text', '') for part in title)
+        if name.strip().lower() == card_name.strip().lower():
+            return row
+    return None
+
+
 def main():
     notion_env = load_env(NOTION_ENV)
     pierre_env = load_simple_env(PIERRE_ENV)
@@ -115,7 +135,8 @@ def main():
                     skipped.append({'description': description, 'reason': 'already_exists'})
                     continue
 
-                page = notion_create_page(notion_token, {
+                card_page = find_card_page(notion_token, card_name)
+                properties = {
                     'Descrição': title_prop(description),
                     'Valor total': number_prop(float(amount or 0)),
                     'Data da compra': date_prop(tx_date),
@@ -127,7 +148,10 @@ def main():
                     'Processada?': checkbox_prop(False),
                     'Purchase Key': rich_text_prop(purchase_key),
                     'Observações': rich_text_prop(f'Importado da Pierre | account={account_name}'),
-                })
+                }
+                if card_page:
+                    properties['Cartão Rel'] = relation_prop([card_page['id']])
+                page = notion_create_page(notion_token, properties)
                 created.append({'description': description, 'id': page['id'], 'card': card_name})
 
     print(json.dumps({'created': created, 'skipped': skipped, 'period': {'start': start_date, 'end': end_date}}, ensure_ascii=False, indent=2))
