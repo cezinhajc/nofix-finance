@@ -88,6 +88,18 @@ def purchase_exists(token: str, purchase_key: str):
     return results[0] if results else None
 
 
+def purchase_exists_by_fingerprint(token: str, card_name: str, tx_date: str, description: str, amount: float):
+    data = notion_query(token, {'page_size': 100})
+    for row in data.get('results', []):
+        row_desc = ''.join(part.get('plain_text', '') for part in row.get('properties', {}).get('Descrição', {}).get('title', []))
+        row_card = ''.join(part.get('plain_text', '') for part in row.get('properties', {}).get('Cartão', {}).get('rich_text', []))
+        row_date = (row.get('properties', {}).get('Data da compra', {}).get('date') or {}).get('start', '')
+        row_amount = row.get('properties', {}).get('Valor total', {}).get('number')
+        if row_card == card_name and row_date == tx_date and row_desc == description and float(row_amount or 0) == float(amount or 0):
+            return row
+    return None
+
+
 def find_card_page(token: str, card_name: str):
     res = requests.post(
         'https://api.notion.com/v1/databases/34d56dc3-d76c-8104-bde4-caa30af4a2f1/query',
@@ -131,7 +143,7 @@ def main():
                 amount = item.get('amount')
                 tx_date = item.get('date', '')[:10]
                 purchase_key = f"pierre:{card_name}:{tx_date}:{description}:{amount}"
-                if purchase_exists(notion_token, purchase_key):
+                if purchase_exists(notion_token, purchase_key) or purchase_exists_by_fingerprint(notion_token, card_name, tx_date, description, float(amount or 0)):
                     skipped.append({'description': description, 'reason': 'already_exists'})
                     continue
 
